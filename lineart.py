@@ -420,7 +420,7 @@ class cuteGraph:
           marker=dict(size=18,
                       line=dict(width=self.point_width,
                                 color=color)),
-          color=color,
+          marker_color=color,
           marker_symbol="x",
           name="Point ("+str(x_point)+" ,"+str(y_point)+")",
           mode="markers"))
