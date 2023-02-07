@@ -418,6 +418,7 @@ class cuteGraph:
       self.fig.add_trace(go.Scatter(
           x=[x_point], y=[y_point],
           marker=dict(size=18,
+                      color=color,
                       line=dict(width=self.point_width,
                                 color=color)),
           marker_color=color,
