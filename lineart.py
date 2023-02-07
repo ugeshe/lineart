@@ -221,7 +221,7 @@ class cuteGraph:
     def addText(self, x, y, text, color):
       self.fig.add_annotation(
           x=x, y=y,
-          text=text,
+          text=text,  
           showarrow=False,
           align="center",
           font=dict(
@@ -420,6 +420,7 @@ class cuteGraph:
           marker=dict(size=18,
                       line=dict(width=self.point_width,
                                 color=color)),
+          color_discrete_sequence=[color],
           marker_symbol="x",
           name="Point ("+str(x_point)+" ,"+str(y_point)+")",
           mode="markers"))
