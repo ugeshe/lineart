@@ -204,6 +204,8 @@ class cuteGraph:
       self.gridDisplay = False
       
     def prepVideo(self, magFactor):
+      self.setStep(step=1.0, stepPixels=20)
+      
       Dx = magFactor*(self.maxX - self.minX)
       Dy = magFactor*(self.maxY - self.minY)
       
@@ -217,9 +219,6 @@ class cuteGraph:
       minY = centerY - Dy/2.0
       maxY = centerY + Dy/2.0
       self.setY(minY=minY, maxY=maxY)
-      
-      # Leave enough space on the right hand side for the text!
-      self.setStep(step=1.0, stepPixels=20)
       
       # Turn off the extras before setting up the grid:
       self.allOff()
