@@ -179,7 +179,7 @@ class cuteGraph:
         self.point_width = 2
 
         # X-axis, Y-axis: use integer values.
-        self.setStep(step=1, stepPixels=40)
+        self.setStep(step=1, stepPixels=20)
         self.setX (minX=-10, maxX=+10)
         self.setY (minY=-5, maxY=+5)
 
@@ -204,7 +204,7 @@ class cuteGraph:
       self.gridDisplay = False
       
     def prepVideo(self, minX, minY, maxX, maxY, magFactor):
-      self.setStep(step=1.0, stepPixels=40)
+      self.setStep(step=1.0, stepPixels=20)
       
       Dx = magFactor*(maxX - minX)
       Dy = magFactor*(maxY - minY)
