@@ -202,6 +202,32 @@ class cuteGraph:
 
     def gridOff(self):
       self.gridDisplay = False
+      
+    def prepVideo(self, magFactor):
+      
+      Dx = magFactor*(self.maxX - self.minX)
+      Dy = magFactor*(self.maxY - self.minY)
+      
+      centerX = (self.maxX + self.minX)/2.0
+      centerY = (self.maxY + self.minY)/2.0
+      
+      self.minX = centerX - Dx/2.0
+      self.maxX = centerX + Dx/2.0
+      self.minY = centerY - Dx/2.0
+      self.maxY = centerY + Dx/2.0
+      
+      # Leave enough space on the right hand side for the text!
+      self.setStep(step=1.0, stepPixels=20)
+      
+      # Turn off the extras before setting up the grid:
+      self.allOff()
+      
+      # Prepare the grid
+      self.setupGrid()
+      
+      # Main house
+      self.setwidths(linewidth=5, pointwidth=2)
+
 
     # Legend options
     def legendOn(self):
@@ -415,6 +441,9 @@ class cuteGraph:
       """ plots a single point (x, y) using line_color
       """
       x_point, y_point, color = PointVal.x, PointVal.y, PointVal.color
+      
+      self.updateBounds(x_vals=[x_point], y_vals=[y_point])
+      
       self.fig.add_trace(go.Scatter(
           x=[x_point], y=[y_point],
           marker=dict(size=18,
@@ -468,6 +497,8 @@ class cuteGraph:
 
       xall = [x1, x2]
       yall = [y1, y2]
+      
+      self.updateBounds(x_vals=xall, y_vals=yall)
 
       # Add the line plot:
       name_str  = "Line segment ("
@@ -479,12 +510,21 @@ class cuteGraph:
           mode="lines+markers",
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
+      
+    def updateBounds(self, x_vals, y_vals):
+      self.minX = min(self.minX, min(x_vals))
+      self.maxX = max(self.maxX, max(x_vals))
+      self.minY = min(self.minY, min(y_vals))
+      self.maxY = max(self.maxY, max(y_vals))
 
     def plotRect(self, RectVal):
       """ plots a rectangle given two corner points.
       """
       x1, x2, y1, y2 = RectVal.x1, RectVal.x2, RectVal.y1, RectVal.y2
       line_color = RectVal.color
+      
+      # Update min and max
+      self.updateBounds(x_vals=[x1, x2], y_vals=[y1, y2])
 
       name_str  = "Rect: line ("
       name_str += str(x1)+", "+str(y1)
