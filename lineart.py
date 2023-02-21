@@ -203,14 +203,14 @@ class cuteGraph:
     def gridOff(self):
       self.gridDisplay = False
       
-    def prepVideo(self, magFactor):
+    def prepVideo(self, minX, minY, maxX, maxY, magFactor):
       self.setStep(step=1.0, stepPixels=40)
       
-      Dx = magFactor*(self.maxX - self.minX)
-      Dy = magFactor*(self.maxY - self.minY)
+      Dx = magFactor*(maxX - minX)
+      Dy = magFactor*(maxY - minY)
       
-      centerX = (self.maxX + self.minX)/2.0
-      centerY = (self.maxY + self.minY)/2.0
+      centerX = (maxX + minX)/2.0
+      centerY = (maxY + minY)/2.0
       
       minX = centerX - Dx/2.0
       maxX = centerX + Dx/2.0
