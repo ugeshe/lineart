@@ -228,6 +228,8 @@ class cuteGraph:
       
       # Main house
       self.setwidths(linewidth=5, pointwidth=2)
+      
+      self.print()
 
 
     # Legend options
