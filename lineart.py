@@ -210,10 +210,13 @@ class cuteGraph:
       centerX = (self.maxX + self.minX)/2.0
       centerY = (self.maxY + self.minY)/2.0
       
-      self.minX = centerX - Dx/2.0
-      self.maxX = centerX + Dx/2.0
-      self.minY = centerY - Dy/2.0
-      self.maxY = centerY + Dy/2.0
+      minX = centerX - Dx/2.0
+      maxX = centerX + Dx/2.0
+      self.setX(minX=minX, maxX=maxX)
+      
+      minY = centerY - Dy/2.0
+      maxY = centerY + Dy/2.0
+      self.setY(minY=minY, maxY=maxY)
       
       # Leave enough space on the right hand side for the text!
       self.setStep(step=1.0, stepPixels=20)
