@@ -204,7 +204,6 @@ class cuteGraph:
       self.gridDisplay = False
       
     def prepVideo(self, magFactor):
-      
       Dx = magFactor*(self.maxX - self.minX)
       Dy = magFactor*(self.maxY - self.minY)
       
