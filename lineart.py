@@ -443,8 +443,6 @@ class cuteGraph:
       """
       x_point, y_point, color = PointVal.x, PointVal.y, PointVal.color
       
-      self.updateBounds(x_vals=[x_point], y_vals=[y_point])
-      
       self.fig.add_trace(go.Scatter(
           x=[x_point], y=[y_point],
           marker=dict(size=18,
@@ -499,8 +497,6 @@ class cuteGraph:
       xall = [x1, x2]
       yall = [y1, y2]
       
-      self.updateBounds(x_vals=xall, y_vals=yall)
-
       # Add the line plot:
       name_str  = "Line segment ("
       name_str += str(x1)+", "+str(y1)
@@ -512,21 +508,13 @@ class cuteGraph:
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
       
-    def updateBounds(self, x_vals, y_vals):
-      self.minX = min(self.minX, min(x_vals))
-      self.maxX = max(self.maxX, max(x_vals))
-      self.minY = min(self.minY, min(y_vals))
-      self.maxY = max(self.maxY, max(y_vals))
-
+    
     def plotRect(self, RectVal):
       """ plots a rectangle given two corner points.
       """
       x1, x2, y1, y2 = RectVal.x1, RectVal.x2, RectVal.y1, RectVal.y2
       line_color = RectVal.color
       
-      # Update min and max
-      self.updateBounds(x_vals=[x1, x2], y_vals=[y1, y2])
-
       name_str  = "Rect: line ("
       name_str += str(x1)+", "+str(y1)
       name_str += ") to ("+str(x1)+", "+str(y2)+")"
