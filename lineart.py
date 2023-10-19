@@ -166,6 +166,7 @@ class cuteGraph:
         self.PointVal   = collections.namedtuple('point', ['x', 'y', 'color'])
         self.RectVal    = collections.namedtuple('rect',     ['x1', 'y1', 'x2', 'y2', 'color'])
         self.LineSegVal = collections.namedtuple('lineseg',  ['x1', 'y1', 'x2', 'y2', 'color'])
+        self.TableVal   = collections.namedtuple('table',  ['col_names', 'col_values'])
 
         # Create the lists:
         self.Lines    = []
@@ -173,6 +174,7 @@ class cuteGraph:
         self.Points   = []
         self.Rects    = []
         self.LineSegs = []
+        self.Tables    = []
 
         # Line and point widths:
         self.line_width  = 2
@@ -324,6 +326,12 @@ class cuteGraph:
       """
       self.Points.append(self.PointVal(x=x,y=y, color=color))
 
+    def table(self, col_names, col_values):
+      """ Add a table as stacked columns
+      """
+      self.Tables.append(self.TableVal(col_names=col_names, col_values= col_values))
+
+  
     def rect(self, x1, y1, x2, y2, color):
       """ Add a rectangle with coordinates (x1, y1) and (x2, y2).
           Uses color to plot the point.
@@ -409,6 +417,9 @@ class cuteGraph:
 
       for i in range(len(self.LineSegs)):
         self.plotLineSeg(self.LineSegs[i])
+      
+      for i in range(len(self.Tables)):
+        self.plotTable(self.Tables[i])
 
       for i in range(len(self.HLines)):
         self.plotHLine(self.HLines[i])
@@ -507,6 +518,16 @@ class cuteGraph:
           mode="lines+markers",
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
+    
+    def plotTable(self, TableVal):
+      """ plots a table from given columns
+      """
+
+      header_values = TableVal.col_names
+      cells_values = TableVal.col_values
+
+      self.fig.add_trace(go.Table(header=dict(values = header_values), cells = dict(values = cells_values)) )
+
       
     
     def plotRect(self, RectVal):
