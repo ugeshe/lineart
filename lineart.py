@@ -166,7 +166,8 @@ class cuteGraph:
         self.PointVal   = collections.namedtuple('point', ['x', 'y', 'color'])
         self.RectVal    = collections.namedtuple('rect',     ['x1', 'y1', 'x2', 'y2', 'color'])
         self.LineSegVal = collections.namedtuple('lineseg',  ['x1', 'y1', 'x2', 'y2', 'color'])
-        self.TableVal   = collections.namedtuple('table',  ['col_names', 'col_values'])
+        self.TableVal   = collections.namedtuple('table',  ['x', 'y'])
+        self.ExpVal   = collections.namedtuple('exp',  ['x', 'y'])
 
         # Create the lists:
         self.Lines    = []
@@ -175,6 +176,7 @@ class cuteGraph:
         self.Rects    = []
         self.LineSegs = []
         self.Tables    = []
+        self.Exps = []
 
         # Line and point widths:
         self.line_width  = 2
@@ -326,12 +328,25 @@ class cuteGraph:
       """
       self.Points.append(self.PointVal(x=x,y=y, color=color))
 
-    def table(self, col_names, col_values):
+    def table(self, x, y):
       """ Add a table as stacked columns
       """
-      self.Tables.append(self.TableVal(col_names=col_names, col_values= col_values))
+      for col_name in x:
+        if not isinstance(col_name, str):
+          raise TypeError("Column names can be strings only")
 
-  
+      for col_val in y:
+        if len(col_val) != len(y[0]):
+          raise TypeError("All table columns should be equal in length")
+
+      self.Tables.append(self.TableVal(x=x, y= y))
+
+    def exp(self, x1, y1):
+      """ Add a exponential from columns
+      """
+      self.Exps.append(self.ExpVal(x=x1, y = y1))
+
+
     def rect(self, x1, y1, x2, y2, color):
       """ Add a rectangle with coordinates (x1, y1) and (x2, y2).
           Uses color to plot the point.
@@ -420,6 +435,10 @@ class cuteGraph:
       
       for i in range(len(self.Tables)):
         self.plotTable(self.Tables[i])
+
+      for i in range(len(self.Exps)):
+        self.plotExp(self.Exps[i])
+
 
       for i in range(len(self.HLines)):
         self.plotHLine(self.HLines[i])
@@ -522,14 +541,20 @@ class cuteGraph:
     def plotTable(self, TableVal):
       """ plots a table from given columns
       """
+      col_names = TableVal.x
+      col_values = TableVal.y
 
-      header_values = TableVal.col_names
-      cells_values = TableVal.col_values
+      self.fig.add_trace(go.Table(header=dict(values = col_names), cells = dict(values = col_values)) )
 
-      self.fig.add_trace(go.Table(header=dict(values = header_values), cells = dict(values = cells_values)) )
+    def plotExp(self, ExpVal):
+      """ plots a exponential graph from given inputs
+      """
+      x1 = ExpVal.x
+      y1 = ExpVal.y
 
-      
-    
+      self.fig.add_trace(go.Scatter(x=x1, y= y1))
+
+
     def plotRect(self, RectVal):
       """ plots a rectangle given two corner points.
       """
