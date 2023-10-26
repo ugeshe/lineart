@@ -167,7 +167,7 @@ class cuteGraph:
         self.RectVal    = collections.namedtuple('rect',     ['x1', 'y1', 'x2', 'y2', 'color'])
         self.LineSegVal = collections.namedtuple('lineseg',  ['x1', 'y1', 'x2', 'y2', 'color'])
         self.TableVal   = collections.namedtuple('table',  ['x', 'y'])
-        self.ExpVal   = collections.namedtuple('exp',  ['x', 'y'])
+        # self.ExpVal   = collections.namedtuple('exp',  ['x', 'y'])
 
         # Create the lists:
         self.Lines    = []
@@ -176,7 +176,7 @@ class cuteGraph:
         self.Rects    = []
         self.LineSegs = []
         self.Tables    = []
-        self.Exps = []
+        # self.Exps = []
 
         # Line and point widths:
         self.line_width  = 2
@@ -341,10 +341,10 @@ class cuteGraph:
 
       self.Tables.append(self.TableVal(x=x, y= y))
 
-    def exp(self, x1, y1):
-      """ Add a exponential from columns
-      """
-      self.Exps.append(self.ExpVal(x=x1, y = y1))
+    # def exp(self, x1, y1):
+    #   """ Add a exponential from columns
+    #   """
+    #   self.Exps.append(self.ExpVal(x=x1, y = y1))
 
 
     def rect(self, x1, y1, x2, y2, color):
@@ -435,9 +435,12 @@ class cuteGraph:
       
       for i in range(len(self.Tables)):
         self.plotTable(self.Tables[i])
+      
+      # for i in range(len(self.Tables)):
+      #   self.plotTableLines(self.Tables[i])
 
-      for i in range(len(self.Exps)):
-        self.plotExp(self.Exps[i])
+      # for i in range(len(self.Exps)):
+      #   self.plotExp(self.Exps[i])
 
 
       for i in range(len(self.HLines)):
@@ -446,7 +449,7 @@ class cuteGraph:
       # Setup the title for all of them:
       if (self.axisVis):
         self.fig.update_layout(
-          title="Plots",
+          title="Journey",
           xaxis_title="X",
           yaxis_title="Y",
           legend_title="List",
@@ -545,6 +548,34 @@ class cuteGraph:
       col_values = TableVal.y
 
       self.fig.add_trace(go.Table(header=dict(values = col_names), cells = dict(values = col_values)) )
+
+    def plotTableLines(self, y):
+      """ plots a table from given columns
+      """
+      # col_names = TableVal.x
+      # col_values = TableVal.y
+      names = ['Diego', 'Lin', 'Mai', 'Tyler']
+
+      for idx in range(0,4):
+        self.fig.add_trace( go.Scatter(x = y[idx][0], y = y[idx][1], mode='lines+markers', name=names[idx]) )
+      
+      self.fig.update_layout(title={
+                                    'text':"Race to the Bumper Cars",
+                                    'y':0.95,
+                                    'x':0.5,
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'},
+                            
+                                xaxis_title="Elapsed time (seconds)",
+                                yaxis_title="Distance from ticket boot (meters)",
+                                legend_title="Journey",
+                                font=dict(
+                                  family="Courier New, monospace",
+                                  size=18,
+                                  color="RebeccaPurple"))
+      
+      self.fig.show()
+
 
     def plotExp(self, ExpVal):
       """ plots a exponential graph from given inputs
