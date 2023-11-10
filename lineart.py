@@ -16,6 +16,9 @@ import numpy as np              # import NumPy library
 import matplotlib.pyplot as plt
 
 import math # for floor and ceiling
+import sympy as sp
+x = sp.symbols('x')
+
 
 # Import plotly
 # !pip install kaleido
@@ -166,7 +169,7 @@ class cuteGraph:
         self.PointVal   = collections.namedtuple('point', ['x', 'y', 'color'])
         self.RectVal    = collections.namedtuple('rect',     ['x1', 'y1', 'x2', 'y2', 'color'])
         self.LineSegVal = collections.namedtuple('lineseg',  ['x1', 'y1', 'x2', 'y2', 'color'])
-        self.TableVal   = collections.namedtuple('table',  ['x', 'y'])
+        # self.TableVal   = collections.namedtuple('table',  ['x', 'y'])
         # self.ExpVal   = collections.namedtuple('exp',  ['x', 'y'])
 
         # Create the lists:
@@ -175,7 +178,7 @@ class cuteGraph:
         self.Points   = []
         self.Rects    = []
         self.LineSegs = []
-        self.Tables    = []
+        # self.Table    = {}
         # self.Exps = []
 
         # Line and point widths:
@@ -328,23 +331,20 @@ class cuteGraph:
       """
       self.Points.append(self.PointVal(x=x,y=y, color=color))
 
-    def table(self, x, y):
-      """ Add a table as stacked columns
-      """
-      for col_name in x:
-        if not isinstance(col_name, str):
-          raise TypeError("Column names can be strings only")
-
-      for col_val in y:
-        if len(col_val) != len(y[0]):
-          raise TypeError("All table columns should be equal in length")
-
-      self.Tables.append(self.TableVal(x=x, y= y))
-
-    # def exp(self, x1, y1):
-    #   """ Add a exponential from columns
+    # def table(self, x, y):
+    #   """ Add a table as stacked columns
     #   """
-    #   self.Exps.append(self.ExpVal(x=x1, y = y1))
+    #   for col_name in x:
+    #     if not isinstance(col_name, str):
+    #       raise TypeError("Column names can be strings only")
+
+    #   for col_val in y:
+    #     if len(col_val) != len(y[0]):
+    #       raise TypeError("All table columns should be equal in length")
+
+    #   # self.Tables.append(self.TableVal(x=x, y= y))
+    #   self.Tables.append([x, y])
+
 
 
     def rect(self, x1, y1, x2, y2, color):
@@ -433,23 +433,13 @@ class cuteGraph:
       for i in range(len(self.LineSegs)):
         self.plotLineSeg(self.LineSegs[i])
       
-      for i in range(len(self.Tables)):
-        self.plotTable(self.Tables[i])
-      
-      # for i in range(len(self.Tables)):
-      #   self.plotTableLines(self.Tables[i])
-
-      # for i in range(len(self.Exps)):
-      #   self.plotExp(self.Exps[i])
-
-
       for i in range(len(self.HLines)):
         self.plotHLine(self.HLines[i])
 
       # Setup the title for all of them:
       if (self.axisVis):
         self.fig.update_layout(
-          title="Journey",
+          title="Plots",
           xaxis_title="X",
           yaxis_title="Y",
           legend_title="List",
@@ -541,49 +531,113 @@ class cuteGraph:
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
     
-    def plotTable(self, TableVal):
+    def plotTable(self, table):
       """ plots a table from given columns
       """
-      col_names = TableVal.x
-      col_values = TableVal.y
+      # Clear figure
+      self.fig.data = []
 
+      # Clear layout
+      self.fig.layout = {}
+
+      # Table column names
+      col_names = table['column_labels']
+
+      # Table values as columns
+      col_values = table['data_values']
+
+      # Add the table plot
       self.fig.add_trace(go.Table(header=dict(values = col_names), cells = dict(values = col_values)) )
-
-    def plotTableLines(self, y):
-      """ plots a table from given columns
-      """
-      # col_names = TableVal.x
-      # col_values = TableVal.y
-      names = ['Diego', 'Lin', 'Mai', 'Tyler']
-
-      for idx in range(0,4):
-        self.fig.add_trace( go.Scatter(x = y[idx][0], y = y[idx][1], mode='lines+markers', name=names[idx]) )
       
+      # Update the layout
+      self.fig.update_layout(autosize = False)
+
+      # Update the figure:
+      self.fig.show()
+
+    def plotTablesLines(self, tables, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
+      """ plots a table as plot from given columns
+      """
+
+      # Clear figure
+      self.fig.data = []
+
+      # Clear layout
+      self.fig.layout = {}
+
+      # Overlay multiple plots in a figure
+
+      for idx in range(0, len(tables)):
+        
+        if legend_labels is not None:
+          self.fig.add_trace( go.Scatter(x = tables[idx]['data_values'][0], y = tables[idx]['data_values'][1], mode='lines+markers', name = legend_labels[idx]) )
+
+          if equation_labels is not None:
+
+            self.fig.add_annotation(
+              x=tables[idx]['data_values'][0][-2],
+              y=tables[idx]['data_values'][1][-2],
+              text=equation_labels[idx],
+              showarrow=False,
+              font=dict(size=16)
+              )
+        else:
+          self.fig.add_trace( go.Scatter(x = tables[idx]['data_values'][0], y = tables[idx]['data_values'][1], mode='lines+markers') )
+
+      # Update the figure layout with titles
       self.fig.update_layout(title={
-                                    'text':"Race to the Bumper Cars",
+                                    'text': fig_title,
                                     'y':0.95,
                                     'x':0.5,
                                     'xanchor': 'center',
                                     'yanchor': 'top'},
                             
-                                xaxis_title="Elapsed time (seconds)",
-                                yaxis_title="Distance from ticket boot (meters)",
-                                legend_title="Journey",
+                                xaxis_title= x_label,
+                                yaxis_title= y_label,
+                                legend_title= legend_title,
                                 font=dict(
                                   family="Courier New, monospace",
                                   size=18,
                                   color="RebeccaPurple"))
-      
+
+      # Update the figure
       self.fig.show()
 
 
-    def plotExp(self, ExpVal):
-      """ plots a exponential graph from given inputs
-      """
-      x1 = ExpVal.x
-      y1 = ExpVal.y
+    # def plotTableLines(self, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None):
+    #   """ plots a table as plot from given columns
+    #   """
 
-      self.fig.add_trace(go.Scatter(x=x1, y= y1))
+    #   # Clear figure
+    #   self.fig.data = []
+
+
+    #   # Overlay multiple plots in a figure
+    #   for idx in range(0,len(self.Tables)):
+    #     if legend_labels is not None:
+    #       self.fig.add_trace( go.Scatter(x = self.Tables[idx].y[0], y = self.Tables[idx].y[1], mode='lines+markers', name = legend_labels[idx]) )
+    #     else:
+    #       self.fig.add_trace( go.Scatter(x = self.Tables[idx].y[0], y = self.Tables[idx].y[1], mode='lines+markers') )
+
+    #   # Update the figure layout with titles
+    #   self.fig.update_layout(title={
+    #                                 'text': fig_title,
+    #                                 'y':0.95,
+    #                                 'x':0.5,
+    #                                 'xanchor': 'center',
+    #                                 'yanchor': 'top'},
+                            
+    #                             xaxis_title= x_label,
+    #                             yaxis_title= y_label,
+    #                             legend_title= legend_title,
+    #                             font=dict(
+    #                               family="Courier New, monospace",
+    #                               size=18,
+    #                               color="RebeccaPurple"))
+
+    #   # Update the figure
+    #   self.fig.show()
+
 
 
     def plotRect(self, RectVal):
@@ -667,6 +721,30 @@ def CreateVideo(video_name, file_list, fps):
   vid = MakeVideo(video_name, width=w_video, height=h_video)
   return vid.HTML_str
 
+
+class equation(cuteGraph):
+  def __init__(self):
+    super().__init__()
+    self.fun_name = ''
+
+  def name(self, fun_name):
+    self.fun_name = fun_name
+  
+  def plot(self, values):
+    result = []
+
+    for val in values:
+      result.append(self.fun_name.subs(x, val))
+
+    self.fig.add_trace( go.Scatter(x = values, y = result) )
+
+    
+
+    
+
+
+
+  
 
 def padding(frame, video, h_video, w_video):
   old_h, old_w, channels = frame.shape
