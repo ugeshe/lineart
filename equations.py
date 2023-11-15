@@ -3,11 +3,6 @@ import plotly.express as px
 import plotly.io as pio
 
 
-fig = go.Figure()
-
-import sympy as sp
-X = sp.symbols('X')
-
 def flip_fun(exp_fun, x_values):
 
     # Clear figure
