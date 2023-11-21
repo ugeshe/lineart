@@ -640,7 +640,7 @@ class table(cuteGraph):
                                   )
         
       # Update the layout
-      tmp.fig.update_layout(autosize = False)
+      # tmp.fig.update_layout(autosize = False)
 
       # Update the figure
       tmp.fig.show()
