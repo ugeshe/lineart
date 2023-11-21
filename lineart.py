@@ -169,8 +169,6 @@ class cuteGraph:
         self.PointVal   = collections.namedtuple('point', ['x', 'y', 'color'])
         self.RectVal    = collections.namedtuple('rect',     ['x1', 'y1', 'x2', 'y2', 'color'])
         self.LineSegVal = collections.namedtuple('lineseg',  ['x1', 'y1', 'x2', 'y2', 'color'])
-        # self.TableVal   = collections.namedtuple('table',  ['x', 'y'])
-        # self.ExpVal   = collections.namedtuple('exp',  ['x', 'y'])
 
         # Create the lists:
         self.Lines    = []
@@ -178,9 +176,7 @@ class cuteGraph:
         self.Points   = []
         self.Rects    = []
         self.LineSegs = []
-        # self.Table    = {}
-        # self.Exps = []
-
+        
         # Line and point widths:
         self.line_width  = 2
         self.point_width = 2
@@ -330,22 +326,6 @@ class cuteGraph:
           Uses color to plot the point.
       """
       self.Points.append(self.PointVal(x=x,y=y, color=color))
-
-    # def table(self, x, y):
-    #   """ Add a table as stacked columns
-    #   """
-    #   for col_name in x:
-    #     if not isinstance(col_name, str):
-    #       raise TypeError("Column names can be strings only")
-
-    #   for col_val in y:
-    #     if len(col_val) != len(y[0]):
-    #       raise TypeError("All table columns should be equal in length")
-
-    #   # self.Tables.append(self.TableVal(x=x, y= y))
-    #   self.Tables.append([x, y])
-
-
 
     def rect(self, x1, y1, x2, y2, color):
       """ Add a rectangle with coordinates (x1, y1) and (x2, y2).
@@ -530,115 +510,6 @@ class cuteGraph:
           mode="lines+markers",
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
-    
-    def plotTable(self, table):
-      """ plots a table from given columns
-      """
-      # Clear figure
-      self.fig.data = []
-
-      # Clear layout
-      self.fig.layout = {}
-
-      # Table column names
-      col_names = table['column_labels']
-
-      # Table values as columns
-      col_values = table['data_values']
-
-      # Add the table plot
-      self.fig.add_trace(go.Table(header=dict(values = col_names), cells = dict(values = col_values)) )
-      
-      # Update the layout
-      self.fig.update_layout(autosize = False)
-
-      # Update the figure:
-      self.fig.show()
-
-    def plotTablesLines(self, tables, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
-      """ plots a table as plot from given columns
-      """
-
-      # Clear figure
-      self.fig.data = []
-
-      # Clear layout
-      self.fig.layout = {}
-
-      # Overlay multiple plots in a figure
-
-      for idx in range(0, len(tables)):
-        
-        if legend_labels is not None:
-          self.fig.add_trace( go.Scatter(x = tables[idx]['data_values'][0], y = tables[idx]['data_values'][1], mode='lines+markers', name = legend_labels[idx]) )
-
-          if equation_labels is not None:
-
-            self.fig.add_annotation(
-              x=tables[idx]['data_values'][0][-2],
-              y=tables[idx]['data_values'][1][-2],
-              text=equation_labels[idx],
-              showarrow=False,
-              font=dict(size=16)
-              )
-        else:
-          self.fig.add_trace( go.Scatter(x = tables[idx]['data_values'][0], y = tables[idx]['data_values'][1], mode='lines+markers') )
-
-      # Update the figure layout with titles
-      self.fig.update_layout(title={
-                                    'text': fig_title,
-                                    'y':0.95,
-                                    'x':0.5,
-                                    'xanchor': 'center',
-                                    'yanchor': 'top'},
-                            
-                                xaxis_title= x_label,
-                                yaxis_title= y_label,
-                                legend_title= legend_title,
-                                font=dict(
-                                  family="Courier New, monospace",
-                                  size=18,
-                                  color="RebeccaPurple"))
-
-      # Update the figure
-      self.fig.show()
-
-
-    # def plotTableLines(self, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None):
-    #   """ plots a table as plot from given columns
-    #   """
-
-    #   # Clear figure
-    #   self.fig.data = []
-
-
-    #   # Overlay multiple plots in a figure
-    #   for idx in range(0,len(self.Tables)):
-    #     if legend_labels is not None:
-    #       self.fig.add_trace( go.Scatter(x = self.Tables[idx].y[0], y = self.Tables[idx].y[1], mode='lines+markers', name = legend_labels[idx]) )
-    #     else:
-    #       self.fig.add_trace( go.Scatter(x = self.Tables[idx].y[0], y = self.Tables[idx].y[1], mode='lines+markers') )
-
-    #   # Update the figure layout with titles
-    #   self.fig.update_layout(title={
-    #                                 'text': fig_title,
-    #                                 'y':0.95,
-    #                                 'x':0.5,
-    #                                 'xanchor': 'center',
-    #                                 'yanchor': 'top'},
-                            
-    #                             xaxis_title= x_label,
-    #                             yaxis_title= y_label,
-    #                             legend_title= legend_title,
-    #                             font=dict(
-    #                               family="Courier New, monospace",
-    #                               size=18,
-    #                               color="RebeccaPurple"))
-
-    #   # Update the figure
-    #   self.fig.show()
-
-
 
     def plotRect(self, RectVal):
       """ plots a rectangle given two corner points.
@@ -686,6 +557,95 @@ class cuteGraph:
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
 
+class table(cuteGraph):
+  def __init__(self, x = None, y = None):
+    super().__init__()
+
+    if x is not None and y is not None:
+      self.column_labels = x
+      self.data_values = y
+    else:
+      self.column_labels = []
+      self.data_values = []
+  
+  def plotTable(self):
+      """ plots a table from given columns
+      """
+      # Clear figure
+      self.fig.data = []
+
+      # Clear layout
+      self.fig.layout = {}
+
+      # Add the table plot
+      self.fig.add_trace(go.Table(header=dict(values = self.column_labels), cells = dict(values = self.data_values)) )
+      
+      # Update the layout
+      self.fig.update_layout(autosize = False)
+
+      # Update the figure:
+      self.fig.show()
+  
+  @classmethod
+  def plotTablesLines(cls, tables = None, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
+      """ plots a table as plot from given columns
+      """
+    
+      # Clear figure data
+      tmp = cls()
+      tmp.fig.data = []
+
+      # Set the plotting parameters
+      tmp.setStep(step=5, stepPixels=50)
+      tmp.setY(minY=0,  maxY= 50)
+      tmp.setX(minX=0, maxX= 50)
+      tmp.setwidths(linewidth=2, pointwidth=3)
+      tmp.setupGrid()
+      
+      
+      # Overlay multiple plots in a figure
+      if tables is not None:
+
+        for tbl_idx, tbl in enumerate(tables):
+          
+          # Line equations
+          if legend_labels is not None:
+            tbl_name = legend_labels[tbl_idx]
+          else:
+            tbl_name = []
+          
+          # Adding plots onto existing figure
+          tmp.fig.add_trace( go.Scatter(x = tbl.data_values[0], 
+                                            y = tbl.data_values[1], 
+                                            mode='lines+markers', 
+                                            name = tbl_name) )
+        
+        # Update the figure layout with titles
+        tmp.fig.update_layout(title=
+                                  {'text': fig_title,
+                                      'y':0.9,
+                                      'x':0.4,
+                                      'xanchor': 'center',
+                                      'yanchor': 'top'
+                                  },
+                                  xaxis_title= x_label,
+                                  yaxis_title= y_label,
+                                  legend_title= legend_title,
+                                  font=
+                                  dict(
+                                    family="Courier New, monospace",
+                                    size=13,
+                                    color="RebeccaPurple"
+                                    )
+                                  )
+        
+      # Update the layout
+      tmp.fig.update_layout(autosize = False)
+
+      # Update the figure
+      tmp.fig.show()
+
+
 
 from skimage import io
 
@@ -720,31 +680,6 @@ def CreateVideo(video_name, file_list, fps):
 
   vid = MakeVideo(video_name, width=w_video, height=h_video)
   return vid.HTML_str
-
-
-class equation(cuteGraph):
-  def __init__(self):
-    super().__init__()
-    self.fun_name = ''
-
-  def name(self, fun_name):
-    self.fun_name = fun_name
-  
-  def plot(self, values):
-    result = []
-
-    for val in values:
-      result.append(self.fun_name.subs(x, val))
-
-    self.fig.add_trace( go.Scatter(x = values, y = result) )
-
-    
-
-    
-
-
-
-  
 
 def padding(frame, video, h_video, w_video):
   old_h, old_w, channels = frame.shape
