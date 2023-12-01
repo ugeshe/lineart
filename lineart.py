@@ -612,65 +612,64 @@ class table(cuteGraph):
       # Update the figure:
       self.fig.show()
   
-    
-  @classmethod
-  def plotTablesLines(cls, tables = None, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
-      """ plots a table as plot from given columns
-      """
-    
-      # Clear figure data
-      tmp = cls()
-      tmp.fig.data = []
 
-      # Set the plotting parameters
-      tmp.setStep(step=5, stepPixels=50)
-      tmp.setY(minY=0,  maxY= 50)
-      tmp.setX(minX=0, maxX= 50)
-      tmp.setwidths(linewidth=2, pointwidth=3)
-      tmp.setupGrid()
-      
-      
-      # Overlay multiple plots in a figure
-      if tables is not None:
+def plotTablesLines(tables = None, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
+    """ plots a table as plot from given columns
+    """
+  
+    # Clear figure data
+    tmp = table()
+    tmp.fig.data = []
 
-        for tbl_idx, tbl in enumerate(tables):
-          
-          # Line equations
-          if legend_labels is not None:
-            tbl_name = legend_labels[tbl_idx]
-          else:
-            tbl_name = []
-          
-          # Adding plots onto existing figure
-          tmp.fig.add_trace( go.Scatter(x = tbl.data_values[0], 
-                                            y = tbl.data_values[1], 
-                                            mode='lines+markers', 
-                                            name = tbl_name) )
+    # Set the plotting parameters
+    tmp.setStep(step=5, stepPixels=50)
+    tmp.setY(minY=0,  maxY= 50)
+    tmp.setX(minX=0, maxX= 50)
+    tmp.setwidths(linewidth=2, pointwidth=3)
+    tmp.setupGrid()
+    
+    
+    # Overlay multiple plots in a figure
+    if tables is not None:
+
+      for tbl_idx, tbl in enumerate(tables):
         
-        # Update the figure layout with titles
-        tmp.fig.update_layout(title=
-                                  {'text': fig_title,
-                                      'y':0.9,
-                                      'x':0.4,
-                                      'xanchor': 'center',
-                                      'yanchor': 'top'
-                                  },
-                                  xaxis_title= x_label,
-                                  yaxis_title= y_label,
-                                  legend_title= legend_title,
-                                  font=
-                                  dict(
-                                    family="Courier New, monospace",
-                                    size=13,
-                                    color="RebeccaPurple"
-                                    )
+        # Line equations
+        if legend_labels is not None:
+          tbl_name = legend_labels[tbl_idx]
+        else:
+          tbl_name = []
+        
+        # Adding plots onto existing figure
+        tmp.fig.add_trace( go.Scatter(x = tbl.data_values[0], 
+                                          y = tbl.data_values[1], 
+                                          mode='lines+markers', 
+                                          name = tbl_name) )
+      
+      # Update the figure layout with titles
+      tmp.fig.update_layout(title=
+                                {'text': fig_title,
+                                    'y':0.9,
+                                    'x':0.4,
+                                    'xanchor': 'center',
+                                    'yanchor': 'top'
+                                },
+                                xaxis_title= x_label,
+                                yaxis_title= y_label,
+                                legend_title= legend_title,
+                                font=
+                                dict(
+                                  family="Courier New, monospace",
+                                  size=13,
+                                  color="RebeccaPurple"
                                   )
-        
-      # Update the layout
-      tmp.fig.update_layout(autosize = False)
+                                )
+      
+    # Update the layout
+    tmp.fig.update_layout(autosize = False)
 
-      # Update the figure
-      tmp.fig.show()
+    # Update the figure
+    tmp.fig.show()
 
 def race(tables = None, vid_width = None, vid_height = None,
          vid_title = None, end_line_scale = None, 
