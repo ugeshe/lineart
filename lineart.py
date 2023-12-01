@@ -677,7 +677,6 @@ def race(tables = None, vid_width = None, vid_height = None,
          end_line_color = None, disp_font_sz = None,
          img_size = None):
 
-      out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
       
       if vid_width is None:
         vid_width = 800
@@ -685,6 +684,7 @@ def race(tables = None, vid_width = None, vid_height = None,
       if vid_height is None:
           vid_height = 600
       
+      out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
       vid_disp = pygame.display.set_mode((vid_width, vid_height))
       pygame.display.set_caption('Race to Bumpers')
       pygame.init()
@@ -791,9 +791,9 @@ def race(tables = None, vid_width = None, vid_height = None,
         if sum(py_rect_speed) == 0:
           break_time +=1
           if break_time >= 3:
+            out_vid.release()
             break
       
-      out_vid.release()
       # return out_vid
         
 
