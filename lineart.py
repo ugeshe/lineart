@@ -19,6 +19,9 @@ import math # for floor and ceiling
 import sympy as sp
 x = sp.symbols('x')
 
+import pygame
+import sys
+import time
 
 # Import plotly
 # !pip install kaleido
@@ -557,8 +560,16 @@ class cuteGraph:
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
 
+watch_speed_factor = 2
+
+def timer(seconds):
+    adjusted_seconds = seconds / watch_speed_factor
+    time.sleep(adjusted_seconds)
+    
 class table(cuteGraph):
-  def __init__(self, x = None, y = None):
+  def __init__(self, x = None, y = None, 
+               img_path = None, img_loc = None, 
+               img_speed = None):
     super().__init__()
 
     if x is not None and y is not None:
@@ -567,6 +578,21 @@ class table(cuteGraph):
     else:
       self.column_labels = []
       self.data_values = []
+    
+    if img_path is not None:
+      self.img_path = img_path
+    else:
+      self.img_path = []
+    
+    if img_loc is not None:
+      self.img_loc = img_loc
+    else:
+      self.img_loc = (0, 0)
+    
+    if img_speed is not None:
+      self.img_speed = img_speed
+    else:
+      self.img_speed = 0
   
   def plotTable(self):
       """ plots a table from given columns
@@ -586,6 +612,7 @@ class table(cuteGraph):
       # Update the figure:
       self.fig.show()
   
+    
   @classmethod
   def plotTablesLines(cls, tables = None, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
       """ plots a table as plot from given columns
@@ -640,11 +667,135 @@ class table(cuteGraph):
                                   )
         
       # Update the layout
-      # tmp.fig.update_layout(autosize = False)
+      tmp.fig.update_layout(autosize = False)
 
       # Update the figure
       tmp.fig.show()
 
+def race(tables = None, vid_width = None, vid_height = None,
+         vid_title = None, end_line_scale = None, 
+         end_line_color = None, disp_font_sz = None,
+         img_size = None):
+
+      out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
+      
+      if vid_width is None:
+        vid_width = 800
+    
+      if vid_height is None:
+          vid_height = 600
+      
+      vid_disp = pygame.display.set_mode((vid_width, vid_height))
+      pygame.display.set_caption('Race to Bumpers')
+      pygame.init()
+      
+      if vid_title is None:
+          vid_title = 'Race to Bumpers'
+      
+      if end_line_scale is None:
+          end_line_scale = 0.3
+      
+      if end_line_scale >= 1 and end_line_scale <= 0:
+          print("Error in end line position")
+          # 'break here'
+
+      if end_line_color is None:
+          end_line_color = (255, 0, 0)
+      
+      if disp_font_sz is None:
+          disp_font_sz = 25
+      
+      if img_size is None:
+        img_size = (50, 50)
+      
+      end_line = vid_width - end_line_scale*vid_width
+      end_line_start = (end_line, 0)
+      end_line_end = (end_line, vid_height)
+      
+      axis_unit = 10
+      axis_line = vid_height - 0.1*vid_height
+      dist_axis = (0, axis_line)
+    
+      axis_font_sz = 15
+      black = (0, 0, 0)
+      
+      vid_disp_font = pygame.font.Font(None, disp_font_sz)
+      
+      py_imgs = []
+      py_rects = []
+      py_rect_speed = []
+      
+      for tbl in tables:
+        py_img = pygame.image.load(tbl.img_path)
+        py_img = pygame.transform.scale(py_img, img_size)
+        
+        py_rect = pygame.Rect(tbl.img_loc[0], tbl.img_loc[1], 
+                              py_img.get_width(), py_img.get_height())
+        
+        py_imgs.append(py_img)
+        py_rects.append(py_rect)
+        py_rect_speed.append(tbl.img_speed)
+
+      race_clock = 0
+      break_time = 0
+      
+      while True:
+        for event in pygame.event.get():
+          if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        
+        vid_disp.fill((255, 255, 255))
+        
+        pygame.draw.line(vid_disp, end_line_color, end_line_start, end_line_end, 1)  
+        pygame.draw.line(vid_disp, black, (0, axis_line), (end_line, axis_line), 1)
+        
+        race_clock += 1
+        timer(0.25)
+        
+        for py_idx, py_rect in enumerate(py_rects):
+          
+          vid_disp.blit(py_imgs[py_idx], py_rect)
+          py_rect.move_ip([tables[py_idx].img_speed, 0])
+          
+          if py_rect.right >= end_line:
+            tables[py_idx].img_speed = 0
+            py_rect_speed[py_idx] = 0
+            
+          
+          dist = vid_disp_font.render(f"Distance: {py_rect.x} m", True, (0, 0, 0))
+          dist_rect = dist.get_rect()
+          dist_rect.topleft = (end_line + 50, py_rect.y)
+          
+          vid_disp.blit(dist, dist_rect)
+          
+          spd = vid_disp_font.render(f"Speed:     {py_rect_speed[py_idx]} m/sec", True, (0, 0, 0))
+          spd_rect = spd.get_rect()
+          spd_rect.topleft = (end_line + 50, py_rect.y + 20)
+          vid_disp.blit(spd, spd_rect)
+          
+          
+        
+        race_timer = vid_disp_font.render(f"Time:       {race_clock} sec", True, (0, 0, 0))
+        race_timer_rect = race_timer.get_rect()
+        race_timer_rect.topleft = (end_line + 50, py_rects[-1].y + 100)
+        vid_disp.blit(race_timer, race_timer_rect)
+        
+        pygame.display.flip()
+
+        cv2_img = pygame.surfarray.array3d(vid_disp)
+        cv2_img = cv2_img.transpose([1, 0, 2])
+        cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_RGB2BGR)
+        out_vid.write(cv2_img)
+        
+        if sum(py_rect_speed) == 0:
+          break_time +=1
+          if break_time >= 3:
+            break
+      
+      out_vid.release()
+      # return out_vid
+        
 
 
 from skimage import io
