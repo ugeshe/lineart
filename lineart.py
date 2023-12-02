@@ -11,6 +11,8 @@ import ipywidgets as widgets
 
 import numpy as np              # import NumPy library
 
+import moviepy.editor
+
 
 # Plot the function:
 import matplotlib.pyplot as plt
@@ -690,7 +692,7 @@ def race(tables = None, vid_width = None, vid_height = None,
       pygame.init()
       
       if vid_title is None:
-          vid_title = 'Race to Bumpers'
+          vid_title = 'Race'
       
       if end_line_scale is None:
           end_line_scale = 0.3
@@ -724,14 +726,17 @@ def race(tables = None, vid_width = None, vid_height = None,
       py_imgs = []
       py_rects = []
       py_rect_speed = []
+      py_img_names = []
       
       for tbl in tables:
+        
         py_img = pygame.image.load(tbl.img_path)
         py_img = pygame.transform.scale(py_img, img_size)
         
         py_rect = pygame.Rect(tbl.img_loc[0], tbl.img_loc[1], 
                               py_img.get_width(), py_img.get_height())
-        
+      
+        py_img_names.append(tbl.img_path.split('/')[0][:-4])  
         py_imgs.append(py_img)
         py_rects.append(py_rect)
         py_rect_speed.append(tbl.img_speed)
@@ -762,16 +767,20 @@ def race(tables = None, vid_width = None, vid_height = None,
             tables[py_idx].img_speed = 0
             py_rect_speed[py_idx] = 0
             
+          img_name = vid_disp_font.render(f"{py_img_names[py_idx]}", True, (0, 0, 0))
+          img_name_rect = img_name.get_rect()
+          img_name_rect.topleft = (end_line + 50, py_rect.y)
+          vid_disp.blit(img_name, img_name_rect)
+          
           
           dist = vid_disp_font.render(f"Distance: {py_rect.x} m", True, (0, 0, 0))
           dist_rect = dist.get_rect()
-          dist_rect.topleft = (end_line + 50, py_rect.y)
-          
+          dist_rect.topleft = (end_line + 50, py_rect.y + 20)
           vid_disp.blit(dist, dist_rect)
           
           spd = vid_disp_font.render(f"Speed:     {py_rect_speed[py_idx]} m/sec", True, (0, 0, 0))
           spd_rect = spd.get_rect()
-          spd_rect.topleft = (end_line + 50, py_rect.y + 20)
+          spd_rect.topleft = (end_line + 50, py_rect.y + 40)
           vid_disp.blit(spd, spd_rect)
           
           
@@ -780,6 +789,11 @@ def race(tables = None, vid_width = None, vid_height = None,
         race_timer_rect = race_timer.get_rect()
         race_timer_rect.topleft = (end_line + 50, py_rects[-1].y + 100)
         vid_disp.blit(race_timer, race_timer_rect)
+        
+        vid_title_ = vid_disp_font.render(f"{vid_title}", True, (0, 0, 0))
+        vid_title_rect = vid_title_.get_rect()
+        vid_title_rect.topleft = (end_line + 50, 10)
+        vid_disp.blit(vid_title_, vid_title_rect)
         
         pygame.display.flip()
 
@@ -797,6 +811,9 @@ def race(tables = None, vid_width = None, vid_height = None,
             out_vid.release()
             break
       
+      # View the Race
+      disp_vid = moviepy.editor.VideoFileClip('out_vid.mp4')
+      disp_vid.ipython_display()
       # return out_vid
         
 
