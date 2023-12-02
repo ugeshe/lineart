@@ -812,13 +812,8 @@ def race(tables = None, vid_width = None, vid_height = None,
             break
       
 
-      return "out_vid.mp4"
+      # return "out_vid.mp4"
         
-
-def view_video_output(vid_path):
-        # View the Race
-      disp_vid = moviepy.editor.VideoFileClip(vid_path)
-      disp_vid.ipython_display()
 
 from skimage import io
 
