@@ -761,12 +761,13 @@ def race(tables = None, vid_width = None, vid_height = None,
         for py_idx, py_rect in enumerate(py_rects):
           
           vid_disp.blit(py_imgs[py_idx], py_rect)
-          py_rect.move_ip([tables[py_idx].img_speed, 0])
           
           if py_rect.right >= end_line:
             tables[py_idx].img_speed = 0
             py_rect_speed[py_idx] = 0
-            
+          
+          py_rect.move_ip([tables[py_idx].img_speed, 0])
+                      
           img_name = vid_disp_font.render(f"{py_img_names[py_idx]}", True, (0, 0, 0))
           img_name_rect = img_name.get_rect()
           img_name_rect.topleft = (end_line + 50, py_rect.y)
