@@ -723,6 +723,7 @@ def race(tables = None, vid_width = None, vid_height = None,
         # Default video height
         vid_height = 600
       
+      # Video to store pygame
       out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
       
       # Set pygame display with video dimensions
@@ -771,8 +772,8 @@ def race(tables = None, vid_width = None, vid_height = None,
         if not isinstance(img_size[0], numbers.Number) and  not isinstance(img_size[1], numbers.Number):
           raise ValueError('Image size should be a number')
       
-        if img_size[0] > 0 and img_size[1] > 0:
-          raise ValueError('Image location should be non negative')
+        if img_size[0] <= 0 and img_size[1] <= 0:
+          raise ValueError('Image location should be postive')
       else:
         # Default size
         img_size = (100, 100)
@@ -794,7 +795,7 @@ def race(tables = None, vid_width = None, vid_height = None,
       # Video character font size
       vid_disp_font = pygame.font.Font(None, disp_font_sz)
       
-      # Extract table objects attrubites 
+      # Extract table objects attributes
       py_imgs = []
       py_rects = []
       py_rect_speed = []
@@ -813,7 +814,7 @@ def race(tables = None, vid_width = None, vid_height = None,
         py_rects.append(py_rect)
         py_rect_speed.append(tbl.img_speed)
 
-      # Counter after reaching stop line
+      # clock counter
       race_clock = 0
       break_time = 0
       
