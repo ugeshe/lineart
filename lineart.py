@@ -11,8 +11,7 @@ import ipywidgets as widgets
 
 import numpy as np              # import NumPy library
 
-import moviepy.editor
-
+import numbers
 
 # Plot the function:
 import matplotlib.pyplot as plt
@@ -574,7 +573,23 @@ class table(cuteGraph):
                img_speed = None):
     super().__init__()
 
+    # Input arugments validation      
     if x is not None and y is not None:
+      if len(x) != len(y):
+        raise ValueError('Number of columns should be' /
+                       'equal to number of column labels')
+        
+      if x is not list or y is not list:
+        raise ValueError('Table inputs should be formated as lists')
+      
+      for column_lables in x:
+        if not isinstance(column_lables, str):
+          raise ValueError('Column lables should be strings')
+      
+      for data_values in y:
+        if not isinstance(data_values, numbers.Number):
+          raise ValueError('Data values should be numbers')
+        
       self.column_labels = x
       self.data_values = y
     else:
@@ -582,16 +597,28 @@ class table(cuteGraph):
       self.data_values = []
     
     if img_path is not None:
+      if not isinstance(img_path, str):
+        raise ValueError('path to image should be string')
+      
       self.img_path = img_path
     else:
       self.img_path = []
     
     if img_loc is not None:
+      if not isinstance(img_loc[0], numbers.Number) and  not isinstance(img_loc[1], numbers.Number):
+        raise ValueError('Image location should be a number')
+      
+      if img_loc[0] > 0 and img_loc[1] > 0:
+        raise ValueError('Image location should be non negative')
+      
       self.img_loc = img_loc
     else:
       self.img_loc = (0, 0)
     
     if img_speed is not None:
+      if img_speed < 1 or not isinstance(x, numbers.Number):
+        raise ValueError('Speed should be number more than 1')
+      
       self.img_speed = img_speed
     else:
       self.img_speed = 0
@@ -615,7 +642,10 @@ class table(cuteGraph):
       self.fig.show()
   
 
-def plotTablesLines(tables = None, fig_title = None, x_label = None, y_label = None, legend_title = None, legend_labels = None, equation_labels = None):
+def plotTablesLines(tables = None, fig_title = 
+                    None, x_label = None, y_label = None, 
+                    legend_title = None, legend_labels = None,
+                    equation_labels = None):
     """ plots a table as plot from given columns
     """
   
@@ -678,51 +708,93 @@ def race(tables = None, vid_width = None, vid_height = None,
          end_line_color = None, disp_font_sz = None,
          img_size = None):
 
-      
-      if vid_width is None:
-        vid_width = 800
+      # Video dimension check
+      if vid_width is not None:
+        if vid_width <= 0 or not isinstance(vid_width, numbers.Number):
+          raise ValueError('video width should be a postive number')
+      else:
+        # Default video width
+        vid_width = 800 
     
-      if vid_height is None:
-          vid_height = 600
+      if vid_height is not None:
+        if vid_height <= 0 or not isinstance(vid_height, numbers.Number):
+          raise ValueError('video height should be a postive number')
+      else:
+        # Default video height
+        vid_height = 600
       
       out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
       
+      # Set pygame display with video dimensions
       vid_disp = pygame.display.set_mode((vid_width, vid_height))
-      pygame.display.set_caption('Race to Bumpers')
+      
+      # pygame.display.set_caption('Race to Bumpers') # Enable this to run locally
+      
+      # Initialize pygame 
       pygame.init()
       
-      if vid_title is None:
-          vid_title = 'Race'
+      # Video title check
+      if vid_title is not None:
+        if not isinstance(vid_title, str):
+          raise ValueError('Video title should be string')
+      else:
+        # Default Name
+        vid_title = 'Race'
       
-      if end_line_scale is None:
-          end_line_scale = 0.3
+      # Stop line check
+      if end_line_scale is not None:
+        if end_line_scale >=1 or end_line_scale <= 0 or not isinstance(end_line_scale, numbers.Number):
+          raise ValueError('end line scale should between 0 and 1')
+      else:
+        # Default value
+        end_line_scale = 0.3
       
-      if end_line_scale >= 1 and end_line_scale <= 0:
-          print("Error in end line position")
-          # 'break here'
-
-      if end_line_color is None:
+      # Stop line color
+      if end_line_color is not None:
+        for color_value in end_line_color:
+          if not isinstance(color_value, numbers.Number):
+            raise ValueError('Colors should be numbers')
+      else:
+        # Red color
           end_line_color = (255, 0, 0)
       
-      if disp_font_sz is None:
-          disp_font_sz = 25
+      # Font size check
+      if disp_font_sz is not None:
+        if not isinstance(disp_font_sz, int):
+          raise ValueError('Font size should be integer')
+      else:
+        # Default value 
+        disp_font_sz = 25
       
-      if img_size is None:
+      # Image Resize dimensions
+      if img_size is not None:
+        if not isinstance(img_size[0], numbers.Number) and  not isinstance(img_size[1], numbers.Number):
+          raise ValueError('Image size should be a number')
+      
+        if img_size[0] > 0 and img_size[1] > 0:
+          raise ValueError('Image location should be non negative')
+      else:
+        # Default size
         img_size = (100, 100)
       
+      # Stop line 
       end_line = vid_width - end_line_scale*vid_width
       end_line_start = (end_line, 0)
       end_line_end = (end_line, vid_height)
       
+      # Axis units
       axis_unit = 10
       axis_line = vid_height - 0.1*vid_height
       dist_axis = (0, axis_line)
-    
       axis_font_sz = 15
+      
+      # Black color
       black = (0, 0, 0)
       
+      # Video character font size
       vid_disp_font = pygame.font.Font(None, disp_font_sz)
       
+      # Extract table objects attrubites 
       py_imgs = []
       py_rects = []
       py_rect_speed = []
@@ -741,71 +813,82 @@ def race(tables = None, vid_width = None, vid_height = None,
         py_rects.append(py_rect)
         py_rect_speed.append(tbl.img_speed)
 
+      # Counter after reaching stop line
       race_clock = 0
       break_time = 0
       
       while True:
-        for event in pygame.event.get():
-          if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+        # for event in pygame.event.get():
+        #   if event.type == pygame.QUIT:
+        #     pygame.quit()
+        #     sys.exit()
         
+        # Fill display with white color
         vid_disp.fill((255, 255, 255))
         
+        # Draw stop line and bottom line
         pygame.draw.line(vid_disp, end_line_color, end_line_start, end_line_end, 1)  
         pygame.draw.line(vid_disp, black, (0, axis_line), (end_line, axis_line), 1)
         
         race_clock += 1
+        
+        # Slow down loop by increase number 
         timer(0.25)
         
+        # Update pygame display for each table 
         for py_idx, py_rect in enumerate(py_rects):
           
-          vid_disp.blit(py_imgs[py_idx], py_rect)
-          
+          # Nulify image speed once reaching stop line
           if py_rect.right >= end_line:
             tables[py_idx].img_speed = 0
             py_rect_speed[py_idx] = 0
           
+          vid_disp.blit(py_imgs[py_idx], py_rect)
+          
+          # Update rectangle at image speed
           py_rect.move_ip([tables[py_idx].img_speed, 0])
-                      
+          
+          # Overlay image name on video display
           img_name = vid_disp_font.render(f"{py_img_names[py_idx]}", True, (0, 0, 0))
           img_name_rect = img_name.get_rect()
           img_name_rect.topleft = (end_line + 50, py_rect.y)
           vid_disp.blit(img_name, img_name_rect)
           
-          
+          # Overlay image distance on video display
           dist = vid_disp_font.render(f"Distance: {py_rect.x} m", True, (0, 0, 0))
           dist_rect = dist.get_rect()
           dist_rect.topleft = (end_line + 50, py_rect.y + 20)
           vid_disp.blit(dist, dist_rect)
           
+          # Overlay image speed on video display 
           spd = vid_disp_font.render(f"Speed:     {py_rect_speed[py_idx]} m/sec", True, (0, 0, 0))
           spd_rect = spd.get_rect()
           spd_rect.topleft = (end_line + 50, py_rect.y + 40)
           vid_disp.blit(spd, spd_rect)
           
           
-        
+        # Overlay clock time on video display
         race_timer = vid_disp_font.render(f"Time:       {race_clock} sec", True, (0, 0, 0))
         race_timer_rect = race_timer.get_rect()
         race_timer_rect.topleft = (end_line + 50, py_rects[-1].y + 100)
         vid_disp.blit(race_timer, race_timer_rect)
         
+        # Overlay video title
         vid_title_ = vid_disp_font.render(f"{vid_title}", True, (0, 0, 0))
         vid_title_rect = vid_title_.get_rect()
         vid_title_rect.topleft = (end_line + 50, 10)
         vid_disp.blit(vid_title_, vid_title_rect)
         
+        # Update entire pygame display
         pygame.display.flip()
 
+        # Save pygame display as video 
         cv2_img = pygame.surfarray.array3d(vid_disp)
         cv2_img = cv2_img.transpose([1, 0, 2])
         cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_RGB2BGR)
         out_vid.write(cv2_img)
         
-        
-        timer(0.25)
-        
+        # Wait and break after reaching stop line        
         if sum(py_rect_speed) == 0:
           break_time +=1
           if break_time >= 3:
