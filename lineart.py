@@ -708,7 +708,7 @@ def race(tables = None, vid_width = None, vid_height = None,
           disp_font_sz = 25
       
       if img_size is None:
-        img_size = (50, 50)
+        img_size = (100, 100)
       
       end_line = vid_width - end_line_scale*vid_width
       end_line_start = (end_line, 0)
