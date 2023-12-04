@@ -660,7 +660,7 @@ def plotTablesLines(tables = None, fig_title =
         raise ValueError('X label should be a string')
     
     if y_label is not None:
-      if isinstance(y_label, str):
+      if not isinstance(y_label, str):
         raise ValueError('Y label should be a string')
     
     if legend_title is not None:
