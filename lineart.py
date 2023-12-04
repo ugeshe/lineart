@@ -561,9 +561,11 @@ class cuteGraph:
           name=name_str,
           line=dict(color=line_color, width=self.line_width)))
 
-watch_speed_factor = 2
 
 def timer(seconds):
+    # Increase to delay the loop
+    watch_speed_factor = 2
+    
     adjusted_seconds = seconds / watch_speed_factor
     time.sleep(adjusted_seconds)
     
@@ -649,6 +651,30 @@ def plotTablesLines(tables = None, fig_title =
     """ plots a table as plot from given columns
     """
   
+    if fig_title is not None:
+      if isinstance(fig_title, str):
+        raise ValueError('Figure title should be a string')
+    
+    if x_label is not None:
+      if isinstance(x_label, str):
+        raise ValueError('X label should be a string')
+    
+    if y_label is not None:
+      if isinstance(y_label, str):
+        raise ValueError('Y label should be a string')
+    
+    if legend_title is not None:
+      if isinstance(legend_title, str):
+        raise ValueError('Legened label should be a string')
+    
+    if legend_labels is not None:
+      for equation in legend_labels:
+        if isinstance(equation, str):
+          raise ValueError('Equations should be a string')
+      
+      if len(legend_labels) != len(tables):
+        raise ValueError('Numbers of labels must be equal to number of tables')
+    
     # Clear figure data
     tmp = table()
     tmp.fig.data = []
@@ -703,9 +729,10 @@ def plotTablesLines(tables = None, fig_title =
     # Update the figure
     tmp.fig.show()
 
-def race(tables = None, vid_width = None, vid_height = None,
-         vid_title = None, end_line_scale = None, 
-         end_line_color = None, disp_font_sz = None,
+def race(tables = None, vid_width = None, 
+         vid_height = None, vid_title = None, 
+         end_line_scale = None, end_line_color = None, 
+         disp_font_sz = None, img_names = None, 
          img_size = None):
 
       # Video dimension check
@@ -715,7 +742,7 @@ def race(tables = None, vid_width = None, vid_height = None,
       else:
         # Default video width
         vid_width = 800 
-    
+
       if vid_height is not None:
         if vid_height <= 0 or not isinstance(vid_height, numbers.Number):
           raise ValueError('video height should be a postive number')
@@ -777,6 +804,16 @@ def race(tables = None, vid_width = None, vid_height = None,
       else:
         # Default size
         img_size = (100, 100)
+        
+      if img_names is not None:
+        if len(img_names) != len(tables):
+          raise ValueError('Numbers of labels must be equal to number of tables')
+        
+        for img_name in img_names:
+          if not isinstance(img_name, str):
+            raise ValueError('Image names should be strings')
+      else:
+        img_names = []
       
       # Stop line 
       end_line = vid_width - end_line_scale*vid_width
@@ -799,7 +836,6 @@ def race(tables = None, vid_width = None, vid_height = None,
       py_imgs = []
       py_rects = []
       py_rect_speed = []
-      py_img_names = []
       
       for tbl in tables:
         
@@ -809,7 +845,6 @@ def race(tables = None, vid_width = None, vid_height = None,
         py_rect = pygame.Rect(tbl.img_loc[0], tbl.img_loc[1], 
                               py_img.get_width(), py_img.get_height())
       
-        py_img_names.append(tbl.img_path.split('/')[0][:-4])  
         py_imgs.append(py_img)
         py_rects.append(py_rect)
         py_rect_speed.append(tbl.img_speed)
@@ -819,6 +854,7 @@ def race(tables = None, vid_width = None, vid_height = None,
       break_time = 0
       
       while True:
+        # Uncomment to run locally
         # for event in pygame.event.get():
         #   if event.type == pygame.QUIT:
         #     pygame.quit()
@@ -826,11 +862,7 @@ def race(tables = None, vid_width = None, vid_height = None,
         
         # Fill display with white color
         vid_disp.fill((255, 255, 255))
-        
-        # Draw stop line and bottom line
-        pygame.draw.line(vid_disp, end_line_color, end_line_start, end_line_end, 1)  
-        pygame.draw.line(vid_disp, black, (0, axis_line), (end_line, axis_line), 1)
-        
+                
         race_clock += 1
         
         # Slow down loop by increase number 
@@ -850,7 +882,7 @@ def race(tables = None, vid_width = None, vid_height = None,
           py_rect.move_ip([tables[py_idx].img_speed, 0])
           
           # Overlay image name on video display
-          img_name = vid_disp_font.render(f"{py_img_names[py_idx]}", True, (0, 0, 0))
+          img_name = vid_disp_font.render(f"{img_names[py_idx]}", True, (0, 0, 0))
           img_name_rect = img_name.get_rect()
           img_name_rect.topleft = (end_line + 50, py_rect.y)
           vid_disp.blit(img_name, img_name_rect)
@@ -879,6 +911,10 @@ def race(tables = None, vid_width = None, vid_height = None,
         vid_title_rect = vid_title_.get_rect()
         vid_title_rect.topleft = (end_line + 50, 10)
         vid_disp.blit(vid_title_, vid_title_rect)
+        
+        # Draw stop line and bottom line
+        pygame.draw.line(vid_disp, end_line_color, end_line_start, end_line_end, 1)  
+        pygame.draw.line(vid_disp, black, (0, axis_line), (end_line, axis_line), 1)
         
         # Update entire pygame display
         pygame.display.flip()
