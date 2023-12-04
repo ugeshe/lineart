@@ -652,11 +652,11 @@ def plotTablesLines(tables = None, fig_title =
     """
   
     if fig_title is not None:
-      if isinstance(fig_title, str):
+      if not isinstance(fig_title, str):
         raise ValueError('Figure title should be a string')
     
     if x_label is not None:
-      if isinstance(x_label, str):
+      if not isinstance(x_label, str):
         raise ValueError('X label should be a string')
     
     if y_label is not None:
@@ -664,12 +664,12 @@ def plotTablesLines(tables = None, fig_title =
         raise ValueError('Y label should be a string')
     
     if legend_title is not None:
-      if isinstance(legend_title, str):
+      if not isinstance(legend_title, str):
         raise ValueError('Legened label should be a string')
     
     if legend_labels is not None:
       for equation in legend_labels:
-        if isinstance(equation, str):
+        if not isinstance(equation, str):
           raise ValueError('Equations should be a string')
       
       if len(legend_labels) != len(tables):
