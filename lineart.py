@@ -660,7 +660,7 @@ def plotTablesLines(tables = None, fig_title =
         raise ValueError('X label should be a string')
     
     if y_label is not None:
-      if not isinstance(y_label, str):
+      if isinstance(y_label, str):
         raise ValueError('Y label should be a string')
     
     if legend_title is not None:
@@ -733,7 +733,7 @@ def race(tables = None, vid_width = None,
          vid_height = None, vid_title = None, 
          end_line_scale = None, end_line_color = None, 
          disp_font_sz = None, img_names = None, 
-         img_size = None):
+         img_size = None, fps = None):
 
       # Video dimension check
       if vid_width is not None:
@@ -750,8 +750,14 @@ def race(tables = None, vid_width = None,
         # Default video height
         vid_height = 600
       
+      if fps is None:
+        if fps <= 0 or isinstance(fps, numbers.Number):
+          raise ValueError('Video fps should be a postive number')
+      else:
+        fps = 10
+      
       # Video to store pygame
-      out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), 20, (vid_width, vid_height))
+      out_vid = cv2.VideoWriter('out_vid.mp4',cv2.VideoWriter_fourcc(*"mp4v"), fps, (vid_width, vid_height))
       
       # Set pygame display with video dimensions
       vid_disp = pygame.display.set_mode((vid_width, vid_height))
@@ -814,6 +820,7 @@ def race(tables = None, vid_width = None,
             raise ValueError('Image names should be strings')
       else:
         img_names = []
+      
       
       # Stop line 
       end_line = vid_width - end_line_scale*vid_width
