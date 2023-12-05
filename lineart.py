@@ -750,7 +750,7 @@ def race(tables = None, vid_width = None,
         # Default video height
         vid_height = 600
       
-      if fps is None:
+      if fps is not None:
         if fps <= 0 or isinstance(fps, numbers.Number):
           raise ValueError('Video fps should be a postive number')
       else:
