@@ -144,6 +144,7 @@ def plot_fun(exp_fun, x_values):
     # Clear layout
     fig.layout = {}
     
+    x_values = np.array(x_values, dtype=float)
     y_values = []
     for val in x_values:
           y_values.append(exp_fun.subs(X, val))
