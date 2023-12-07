@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
+import numpy as np
 
 fig = go.Figure()
 
@@ -15,21 +16,26 @@ def flip_fun(exp_fun, x_values):
     # Clear layout
     fig.layout = {}
     
+    # convert x values to float type
+    x_values = np.array(x_values, dtype=float)
+    
     y_values = []
     for val in x_values:
           y_values.append(exp_fun.subs(X, val))
 
-    # fig = go.Figure(data= go.Scatter(x = x_values, y = y_values, mode='lines+markers'))
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(exp_fun)) )
+    y_values = np.array(y_values, dtype=float)
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(exp_fun)) )
 
     fliped_fun = exp_fun.subs(X, -X)
 
     y_values = []
     for val in x_values:
           y_values.append(fliped_fun.subs(X, val))
+    
+    y_values = np.array(y_values, dtype=float)
 
     fliped_fun = exp_fun.subs(X, -X)
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(fliped_fun)))
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(fliped_fun)))
 
     # Update the layout
     fig.update_layout(autosize = False)
@@ -52,13 +58,14 @@ def shift_fun(exp_fun, x_values, change):
 
     # Clear layout
     fig.layout = {}
-     
+    
+    x_values = np.array(x_values, dtype=float)
     y_values = []
     for val in x_values:
           y_values.append(exp_fun.subs(X, val))
 
-    # fig = go.Figure(data= go.Scatter(x = x_values, y = y_values, mode='lines+markers'))
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(exp_fun)) )
+    y_values = np.array(y_values, dtype=float)
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(exp_fun)) )
 
     if isinstance(change, sp.Basic):
         modified_fun = exp_fun.subs(X, change)
@@ -66,13 +73,15 @@ def shift_fun(exp_fun, x_values, change):
         y_values = []
         for val in x_values:
             y_values.append(modified_fun.subs(X, val))
-        fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(modified_fun) + str(change)) )
+            
+        y_values = np.array(y_values, dtype=float)
+        fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(modified_fun) + str(change)) )
         
     else:
          y_values = [y + change for y in y_values]
-
-        # fig = go.Figure(data= go.Scatter(x = x_values, y = y_values, mode='lines+markers'))
-         fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(exp_fun) + f"{change}" ) )
+         
+         y_values = np.array(y_values, dtype=float)
+         fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(exp_fun) + f"{change}" ) )
 
     # Update the layout
     fig.update_layout(autosize = False)
@@ -94,20 +103,21 @@ def compare_fun(exp_fun, modified_fun, x_values):
 
     # Clear layout
     fig.layout = {}
-     
+    
+    x_values = np.array(x_values, dtype=float)
     y_values = []
     for val in x_values:
           y_values.append(exp_fun.subs(X, val))
 
-    # fig = go.Figure(data= go.Scatter(x = x_values, y = y_values, mode='lines+markers'))
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name = str(exp_fun)) )
+    y_values = np.array(y_values, dtype=float)
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name = str(exp_fun)) )
 
     y_values = []
     for val in x_values:
         y_values.append(modified_fun.subs(X, val))
 
-    # fig = go.Figure(data= go.Scatter(x = x_values, y = y_values, mode='lines+markers'))
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers', name= str(modified_fun)) )
+    y_values = np.array(y_values, dtype=float)
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers', name= str(modified_fun)) )
 
     # Update the layout
     fig.update_layout(autosize = False)
@@ -138,7 +148,8 @@ def plot_fun(exp_fun, x_values):
     for val in x_values:
           y_values.append(exp_fun.subs(X, val))
 
-    fig.add_trace(go.Scatter(x = x_values, y = list(map(int, y_values)), mode='lines+markers' ) )
+    y_values = np.array(y_values, dtype=float)
+    fig.add_trace(go.Scatter(x = x_values, y = y_values, mode='lines+markers' ) )
 
     # Update the layout
     fig.update_layout(autosize = False)
@@ -153,68 +164,3 @@ def plot_fun(exp_fun, x_values):
 
     # Update the figure:
     fig.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import sympy as sp
-
-# x = sp.symbols('x')
-
-# exp_fun = 0.05*2**x
-# new_exp_fun = exp_fun.subs(x, x-5)
-
-# values = list(range(0, 10))
-
-# results = []
-# for val in values:
-#     results.append(exp_fun.subs(x, val))
-
-# # results = [expression.subs(x, value) for value in values]
-
-# print(exp_fun.subs(x, list(range(0, 10))))
-
-
-# a = 5
-
-
